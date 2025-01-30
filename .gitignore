@@ -1,0 +1,10 @@
+# folders
+__pycache__/
+
+# files
+*.png
+*.PNG
+*.jpg
+*.json
+*.txt
+*.sublime-*
