@@ -14,6 +14,7 @@ class Ollama():
 	port = 0
 
 	# user chat data
+	system = "Reply to the following message from the user."
 	messages = []
 
 	# if things aren't working, you may want to check that the requests being sent are right
@@ -23,6 +24,10 @@ class Ollama():
 		self.model = model
 		self.ip = ip
 		self.port = port
+
+	# set the system prompt for this session - the default is short and generic
+	def setSystemPrompt(self, prompt):
+		self.system = prompt
 
 	# ask the current server to load the current model in preparation for a message
 	# this is optional, calling ask() or chat() will also load the model
@@ -48,7 +53,7 @@ class Ollama():
 			"messages": [
 				{
 					"role": "system",
-					"content": "Reply to the following message from the user."
+					"content": self.system
 				}
 			],
 			"stream": False,
@@ -178,7 +183,7 @@ class Ollama():
 	def clear(self):
 		self.messages = []
 
-	# check if the current model is currently loaded on the current server
+	# check if the set model is loaded on the server right now
 	def isLoaded(self):
 		url = f"http://{self.ip}:{self.port}/api/ps"
 		headers = {'Content-Type': 'application/json'}
@@ -212,17 +217,19 @@ class Ollama():
 	# search for a model by name on the specified server, returning the exact model name (or None for no match)
 	@staticmethod
 	def searchModels(search, ip = "localhost", port = 11434):
-		matches = []
+		best = None
+		score = (float('inf'), float('inf'))
 
 		models = Ollama.listModels(ip, port)
 		for model in models:
-			if model.find(search) >= 0:
-				matches.append(model)
-
-		if len(matches) == 0:
-			return None
-
-		return sorted(matches, key=lambda s: (len(s[:s.find(':')]), s))[0]
+			index = model.find(search)
+			# prefer models that match earlier in the name and have a shorter overall name
+			if index != -1:
+				modelscore = (index, len(model))
+				if modelscore < score:
+					score = modelscore
+					best = model
+		return best
 
 	# request that the specified server unload all models that it has loaded currently
 	@staticmethod
