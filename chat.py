@@ -20,6 +20,8 @@ def main():
 		print(f"No model named '{model}' is available!", file=sys.stderr)
 		print(f"The available models are:\n\t{(chr(10)+chr(9)).join(models)}", file=sys.stderr)
 		return
+	else:
+		print(f"Using model '{modelname}'")
 
 	# default ip is localhost, default port is Ollama default (11434)
 	ol = Ollama(modelname)
