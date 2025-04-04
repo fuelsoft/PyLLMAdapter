@@ -249,7 +249,7 @@ class Ollama():
 			post(unloadUrl, headers = headers, data = json.dumps({"model": model["model"], "keep_alive": 0}))
 
 # when the LLM replies, you'll get one of these back
-# they contain the message and some metadat about the call
+# they contain the message and some metadata about the call
 class Reply():
 	def __init__(self, data):
 		self.raw = data
