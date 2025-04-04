@@ -2,6 +2,7 @@
 
 # A super lightweight and easy to use LLM adapter for Ollama
 
+import re
 import sys
 import json
 import base64
@@ -269,3 +270,17 @@ class Reply():
 		if remove_dot and string.endswith('.'):
 			return string[:-1]
 		return string
+	
+	def json(self):
+		pattern = r"^(?:```(?:json)?\s*\n)?(.*?)(?:\n```)?$"
+		match = re.match(pattern, self.message, re.DOTALL)
+
+		try:
+			if match:
+				return json.loads(match.group(1))
+			else:
+				return json.loads(self.message)
+		except:
+			print("Failed to parse JSON from reply!", file=sys.stderr)
+			return []
+
